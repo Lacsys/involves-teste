@@ -34,6 +34,7 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:$rootProject.ext.support_version"
     implementation "com.android.support:support-v4:$rootProject.ext.support_version"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation "com.android.support:design:$rootProject.ext.support_version"
 
     // Lifecycle
     implementation "android.arch.lifecycle:extensions:$rootProject.ext.archComponentsVersion"

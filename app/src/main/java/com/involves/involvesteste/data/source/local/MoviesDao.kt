@@ -7,6 +7,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.involves.involvesteste.data.model.Movie
+import com.involves.involvesteste.data.model.MovieDetail
 import io.reactivex.Single
 
 @Dao
@@ -16,7 +17,7 @@ interface MoviesDao {
     fun queryUpcomingMovies() : Single<List<Movie>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMovie(movie: Movie)
+    fun insertMovie(movie: MovieDetail)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMovies(movies: List<Movie>)
@@ -24,6 +25,6 @@ interface MoviesDao {
     @Query("SELECT * FROM movies")
     fun queryUpcomingMoviesDb() : DataSource.Factory<Int, Movie>
 
-    @Query("SELECT * FROM movies WHERE id == :movieId")
-    fun queryDetailMovieDb(movieId: Int) : LiveData<Movie>
+    @Query("SELECT * FROM movies WHERE id = :movieId")
+    fun queryDetailMovieDb(movieId: Int) : LiveData<MovieDetail>
 }

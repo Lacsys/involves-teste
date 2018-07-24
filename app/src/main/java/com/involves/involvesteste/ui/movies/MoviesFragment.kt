@@ -1,10 +1,9 @@
-package com.involves.involvesteste.movies
+package com.involves.involvesteste.ui.movies
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.arch.paging.PagedList
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -13,14 +12,14 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.involves.involvesteste.R
+import com.involves.involvesteste.base.BaseFragment
 import com.involves.involvesteste.data.model.Movie
 import com.involves.involvesteste.injection.Injection
-import com.involves.involvesteste.ui.movies.MoviesViewModel
 import com.involves.involvesteste.ui.movies.adapter.MoviesAdapter
 import kotlinx.android.synthetic.main.fragment_movies.*
 
 
-class MoviesFragment : Fragment() {
+class MoviesFragment : BaseFragment() {
 
     private lateinit var recyclerView : RecyclerView
     private lateinit var viewModel : MoviesViewModel

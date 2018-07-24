@@ -7,20 +7,6 @@ import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
-@Entity(tableName = "movies")
-data class Movie(
-        @PrimaryKey
-        val id : Int,
-        @SerializedName("poster_path") val posterPath : String?,
-        @SerializedName("overview") val overview : String?,
-        @SerializedName("release_date") val releaseDate : String?,
-        @SerializedName("original_title") val originalTitle : String?,
-        @SerializedName("title") val title : String?,
-        @SerializedName("backdrop_path") val backdropPath : String?,
-        @SerializedName("genre_ids") val genreIds: List<Int>?
-
-)
-
 data class MoviesResponse(
         val page : Int,
         val results : List<Movie>,
@@ -31,15 +17,15 @@ data class MoviesResult(
         val moviesData: LiveData<PagedList<Movie>>
 )
 
+@Entity(tableName = "movies_detail")
 data class MovieDetail(
+        @PrimaryKey
         val id : Int,
+        @SerializedName("original_title") val originalTitle : String?,
+        @SerializedName("title") val title : String?,
         @SerializedName("poster_path") val posterPath : String?,
         val overview : String?,
-        @SerializedName("release_date") val releaseDate : Date?,
-        val genres : List<Genre>?
-)
-
-data class Genre(
-        val id : Int,
-        val name : String?
+        @SerializedName("release_date") val releaseDate : String?,
+        val genres : List<Genre>?,
+        val tagline : String?
 )

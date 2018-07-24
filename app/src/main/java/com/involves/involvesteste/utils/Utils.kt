@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import com.involves.involvesteste.InvolvesTestApplication
+import java.text.SimpleDateFormat
+import java.util.*
 
 object Utils {
 
@@ -19,5 +21,12 @@ object Utils {
                     }
         }
         return false
+    }
+
+    fun formatDate(fromPattern: String, toPattern: String, value: String) : String {
+        val sdf = SimpleDateFormat(fromPattern, Locale.getDefault())
+        val date = sdf.parse(value)
+        sdf.applyPattern(toPattern)
+        return sdf.format(date)
     }
 }

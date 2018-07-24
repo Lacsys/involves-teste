@@ -5,8 +5,9 @@ import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.TypeConverters
 import com.involves.involvesteste.data.model.Converters
 import com.involves.involvesteste.data.model.Movie
+import com.involves.involvesteste.data.model.MovieDetail
 
-@Database(entities = [(Movie::class)], version = 1)
+@Database(entities = [(Movie::class), (MovieDetail::class)], version = 1)
 @TypeConverters(Converters::class)
 abstract class InvolvesDatabase : RoomDatabase() {
 

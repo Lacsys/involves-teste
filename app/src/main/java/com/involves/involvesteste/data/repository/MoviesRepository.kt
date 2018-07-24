@@ -2,11 +2,15 @@ package com.involves.involvesteste.data.repository
 
 import android.arch.lifecycle.LiveData
 import android.arch.paging.LivePagedListBuilder
+import android.util.Log
 import com.involves.involvesteste.data.MoviesBoundaryCallback
 import com.involves.involvesteste.data.model.Movie
+import com.involves.involvesteste.data.model.MovieDetail
 import com.involves.involvesteste.data.model.MoviesResult
 import com.involves.involvesteste.data.source.local.MoviesLocalCache
 import com.involves.involvesteste.data.source.remote.ApiService
+import com.involves.involvesteste.data.source.remote.getMovieForId
+import com.involves.involvesteste.utils.Utils
 
 class MoviesRepository(
         private val service : ApiService,
@@ -32,7 +36,19 @@ class MoviesRepository(
         return MoviesResult(data)
     }
 
-    fun detailMovie(movieId : Int) : LiveData<Movie> {
+    fun detailMovieFromId(movieId : Int) : LiveData<MovieDetail> {
+        val hasConnection = Utils.isConnectedToInternet()
+        if (hasConnection) {
+            getMovieForId(service, movieId, {
+                it?.let {movieDetail ->
+                    moviesCache.insertMovie(movieDetail, {
+
+                    })
+                }
+            }, {
+                    error -> Log.d("MoviesRepository", error)
+            })
+        }
         return moviesCache.getMovieDetailDb(movieId)
     }
 

@@ -8,12 +8,18 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.involves.involvesteste.R
+import com.involves.involvesteste.data.model.Movie
 import com.involves.involvesteste.injection.Injection
+import com.involves.involvesteste.utils.Constants
+import com.involves.involvesteste.utils.Utils
+import kotlinx.android.synthetic.main.fragment_movie_detail.*
 
 class MovieDetailFragment : Fragment() {
 
-    private var movieId: Int = -1
+    private lateinit var movie: Movie
 
     private lateinit var viewModel: MovieDetailViewModel
 
@@ -25,35 +31,52 @@ class MovieDetailFragment : Fragment() {
                     .get(MovieDetailViewModel::class.java)
         }
 
+        viewModel.getMovieDetail(movie.id).observe(this, Observer {
+            toolbar.title = it?.title
+            Glide.with(this)
+                    .load(Constants.IMG_BASE_URL+movie.backdropPath)
+                    .apply(RequestOptions().centerCrop())
+                    .into(appbar_movie_poster)
+            txt_release_date.text = " - "
+            txt_description.text = " - "
 
-//        viewModel.movie.observe(this, Observer {
-//            viewModel.getMovieDetail(movieId)
-//        })
-        viewModel.getMovieDetail(movieId)
+            it?.releaseDate?.let {
+                txt_release_date.text = String.format(getString(R.string.release_date),
+                        Utils.formatDate("yyyy-MM-dd", "dd/MM/yyyy", it))
+            }
+            it?.tagline?.let {
+                txt_description.text = it
+            }
+
+            val genresString = " - "
+            it?.genres?.let {
+                for(genre in it) {
+                    genresString.plus(", ").plus(genre.name)
+                }
+            }
+
+            txt_genre.text = genresString
+
+            txt_overview.text = it?.overview
+
+        })
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         arguments?.let {
-            movieId = arguments!!.getInt("movie_id")
+            movie = arguments!!.getParcelable("movie")
         }
 
-
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_movie_detail, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(movieId : Int) = MovieDetailFragment().apply {
+        fun newInstance(movie : Movie) = MovieDetailFragment().apply {
                     arguments = Bundle().apply {
-                        putInt("movie_id", movieId)
+                        putParcelable("movie", movie)
                     }
                 }
     }

@@ -3,13 +3,11 @@ package com.involves.involvesteste.data.source.remote
 import android.util.Log
 import com.involves.involvesteste.data.model.Genre
 import com.involves.involvesteste.data.model.Movie
+import com.involves.involvesteste.data.model.MovieDetail
 import com.involves.involvesteste.data.model.MoviesResponse
-import com.involves.involvesteste.data.model.MoviesResult
 import com.involves.involvesteste.utils.Constants
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,7 +22,7 @@ interface ApiService {
     fun getUpcomingMovies(@Query("page") page : Int, @Query("language") language : String) : Call<MoviesResponse>
 
     @GET("movie/{movie_id}")
-    fun getDetailMovie(@Path("movie_id") movieId : Int) : Observable<Response<Movie>>
+    fun getDetailMovie(@Path("movie_id") movieId : Int) : Call<MovieDetail>
 
     @GET("genre/movie/list")
     fun getGenresList() : Observable<Response<List<Genre>>>
@@ -37,23 +35,8 @@ fun searchMovies(
         itemsPerPage: Int,
         onSuccess: (repos: List<Movie>) -> Unit,
         onError: (error: String) -> Unit) {
-    Log.d("ApiService", "query: $query, page: $page, itemsPerPage: $itemsPerPage")
+        Log.d("ApiService", "query: $query, page: $page, itemsPerPage: $itemsPerPage")
 
-//    val apiQuery = query + IN_QUALIFIER
-
-//    service.getUpcomingMovies(page, Constants.LANGUAGE)
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe(
-//                    {result ->
-//                        onSuccess(result.results)
-////                        moviesView?.onFetchDataSuccess(result)
-//                    },
-//                    {error ->
-////                        moviesView?.onFetchDataError(error)
-//                        onError(error.message ?: "Unknown")
-//                    }
-//            )
     service.getUpcomingMovies(page, Constants.LANGUAGE).enqueue(
             object : Callback<MoviesResponse> {
                 override fun onFailure(call: Call<MoviesResponse>?, t: Throwable) {
@@ -76,3 +59,28 @@ fun searchMovies(
             }
     )
 }
+
+fun getMovieForId(
+        service: ApiService,
+        movieId: Int,
+        onSuccess: (repos: MovieDetail?) -> Unit,
+        onError: (error: String) -> Unit) {
+
+    service.getDetailMovie(movieId)
+            .enqueue(
+                    object : Callback<MovieDetail> {
+                        override fun onFailure(call: Call<MovieDetail>?, t: Throwable) {
+                            onError(t.message ?: "unknown error")
+                        }
+
+                        override fun onResponse(call: Call<MovieDetail>?, response: Response<MovieDetail>) {
+                            if (response.isSuccessful) {
+                                val movie = response.body()
+                                onSuccess(movie)
+                            } else {
+                                onError(response.errorBody()?.string() ?: "Unknown error")
+                            }
+                        }
+                    }
+            )
+        }

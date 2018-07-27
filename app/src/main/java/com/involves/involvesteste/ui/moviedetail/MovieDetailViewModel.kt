@@ -2,8 +2,11 @@ package com.involves.involvesteste.ui.moviedetail
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.involves.involvesteste.data.model.MovieDetail
+import com.involves.involvesteste.data.model.Movie
+import com.involves.involvesteste.data.model.MovieAllGenres
+import com.involves.involvesteste.data.model.MovieResult
 import com.involves.involvesteste.data.repository.MoviesRepository
 
 class MovieDetailViewModel(
@@ -11,10 +14,17 @@ class MovieDetailViewModel(
 ) : ViewModel() {
 
     private val queryLiveData = MutableLiveData<Int>()
+    private val movieResult: LiveData<MovieResult> = Transformations.map(queryLiveData, {
+        repository.detailMovieFromId(it)
+    })
 
-    fun getMovieDetail(id: Int) : LiveData<MovieDetail> {
-        queryLiveData.value = id
+    val movieDetail: LiveData<MovieAllGenres> = Transformations.switchMap(movieResult, {
+        it.movie
+    })
+
+    fun getMovieDetail(id: Int) {
         queryLiveData.postValue(id)
-        return repository.detailMovieFromId(id)
+//        queryLiveData.postValue(id)
+//        return repository.detailMovieFromId(id)
     }
 }

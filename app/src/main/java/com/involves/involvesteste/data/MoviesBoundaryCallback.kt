@@ -32,7 +32,7 @@ class MoviesBoundaryCallback(
 ) : PagedList.BoundaryCallback<Movie>() {
 
     companion object {
-        private const val NETWORK_PAGE_SIZE = 2
+        private const val NETWORK_PAGE_SIZE = 10
     }
 
     // keep the last requested page. When the request is successful, increment the page number.
@@ -66,8 +66,8 @@ class MoviesBoundaryCallback(
         if (isRequestInProgress) return
 
         isRequestInProgress = true
-        searchMovies(service, query, lastRequestedPage, NETWORK_PAGE_SIZE, { movies ->
-            cache.insert(movies, {
+        searchMovies(service, query, lastRequestedPage, { movies ->
+            cache.insertMovies(movies, {
                 lastRequestedPage++
                 isRequestInProgress = false
             })

@@ -6,7 +6,7 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.arch.paging.PagedList
 import com.involves.involvesteste.data.model.Movie
-import com.involves.involvesteste.data.model.MoviesResult
+import com.involves.involvesteste.data.model.MoviesListResult
 import com.involves.involvesteste.data.repository.MoviesRepository
 
 class MoviesViewModel(
@@ -14,11 +14,11 @@ class MoviesViewModel(
 ) : ViewModel() {
 
     private val queryLiveData = MutableLiveData<String>()
-    private val movieResult: LiveData<MoviesResult> = Transformations.map(queryLiveData, {
+    private val movieListResult: LiveData<MoviesListResult> = Transformations.map(queryLiveData, {
         repository.search(it)
     })
 
-    val movies: LiveData<PagedList<Movie>> = Transformations.switchMap(movieResult,
+    val movies: LiveData<PagedList<Movie>> = Transformations.switchMap(movieListResult,
             { it -> it.moviesData
             })
 

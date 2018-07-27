@@ -29,10 +29,6 @@ object Injection {
         return providesRetrofitInstance(providesUrl())!!.create<ApiService>(ApiService::class.java)
     }
 
-    private fun providesMoviesDao(): MoviesDao {
-        return InvolvesTestApplication.instance.getDatabase().moviesDao()
-    }
-
 
     private fun providesRetrofitInstance(serverUrl: String): Retrofit? {
         if (retrofitInstance == null) {
@@ -70,7 +66,7 @@ object Injection {
 
     private fun provideCache(context: Context): MoviesLocalCache {
         val database = InvolvesTestApplication.instance.getDatabase()
-        return MoviesLocalCache(database.moviesDao(), Executors.newSingleThreadExecutor())
+        return MoviesLocalCache(database.moviesDao(), database.genresDao(), Executors.newSingleThreadExecutor())
     }
 
     private fun provideMoviesRepository(context: Context): MoviesRepository {

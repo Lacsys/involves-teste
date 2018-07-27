@@ -1,12 +1,11 @@
 package com.involves.involvesteste.data.repository
 
-import android.arch.lifecycle.LiveData
 import android.arch.paging.LivePagedListBuilder
 import android.util.Log
 import com.involves.involvesteste.data.MoviesBoundaryCallback
 import com.involves.involvesteste.data.model.Movie
-import com.involves.involvesteste.data.model.MovieDetail
-import com.involves.involvesteste.data.model.MoviesResult
+import com.involves.involvesteste.data.model.MovieResult
+import com.involves.involvesteste.data.model.MoviesListResult
 import com.involves.involvesteste.data.source.local.MoviesLocalCache
 import com.involves.involvesteste.data.source.remote.ApiService
 import com.involves.involvesteste.data.source.remote.getMovieForId
@@ -17,7 +16,7 @@ class MoviesRepository(
         private val moviesCache : MoviesLocalCache
 ) {
 
-    fun search(query: String): MoviesResult {
+    fun search(query: String): MoviesListResult {
         // Get data source factory from the local cache
         val dataSourceFactory = moviesCache.getMoviesDb(query)
 
@@ -33,27 +32,47 @@ class MoviesRepository(
                 .build()
 
         // Get the network errors exposed by the boundary callback
-        return MoviesResult(data)
+        return MoviesListResult(data)
     }
 
-    fun detailMovieFromId(movieId : Int) : LiveData<MovieDetail> {
+    fun detailMovieFromId(movieId : Int) : MovieResult {
         val hasConnection = Utils.isConnectedToInternet()
         if (hasConnection) {
             getMovieForId(service, movieId, {
                 it?.let {movieDetail ->
-                    moviesCache.insertMovie(movieDetail, {
 
-                    })
+                    if (movieDetail.genres != null) {
+                        for (index in movieDetail.genres.indices) {
+                            moviesCache.insertGenre(movieDetail.genres[index].id, movieDetail.genres[index].name, movieId, {
+                                Log.i(TAG, "inserted ${movieDetail.genres.size} genres on db")
+                            })
+                        }
+
+                    }
+
+                    val movie = Movie(
+                            movieDetail.id,
+                            movieDetail.posterPath,
+                            movieDetail.overview,
+                            movieDetail.releaseDate,
+                            movieDetail.originalTitle,
+                            movieDetail.title,
+                            movieDetail.backdropPath,
+                            movieDetail.tagline
+                    )
+
+                    moviesCache.editMovie(movie, {})
                 }
             }, {
                     error -> Log.d("MoviesRepository", error)
             })
         }
-        return moviesCache.getMovieDetailDb(movieId)
+        return MovieResult(moviesCache.getMovieDetailDb(movieId))
     }
 
     companion object {
         private const val DATABASE_PAGE_SIZE = 20
+        private const val TAG = "MoviesRepository"
     }
 
 }
